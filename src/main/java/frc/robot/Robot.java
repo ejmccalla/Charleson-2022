@@ -27,12 +27,19 @@ public class Robot extends TimedRobot {
     DoubleLogEntry imuTemp;
 
     public Robot() {
+        // Set the loop rate to 5ms since the IMU data will be sampled every 5ms by the 
+        // robot pose estimator.
         super(0.005); 
     }
 
     @Override
     public void robotInit() {
-        LiveWindow.disableAllTelemetry();
+        LiveWindow.disableAllTelemetry(); // This only serves to chew up unnecessary CPU cylcles, disable it
+
+        // Use the new data logger to log the IMU heading and temperature. Be sure to always use a USB thumb drive for
+        // logging. To do this, be sure to format the thumb drive with a RoboRIO compatible FS (like FAT32) and simply
+        // plug into one of the 2 USB ports on the RoboRIO.
+        // See https://docs.wpilib.org/en/stable/docs/software/telemetry/datalog.html
         DataLogManager.start();
         DataLogManager.logNetworkTables( false );
         DataLog log = DataLogManager.getLog();
@@ -42,17 +49,7 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void robotPeriodic() {
-        if ( timer.hasElapsed( 120 ) ) {
-            mRobotContainer.mIMU.calibrate();
-            mRobotContainer.mIMU.reset();
-            DriverStation.reportWarning( "ADIS16470 IMU recalibrated!", false );
-            timer.stop();
-            timer.reset();
-        }
-        imuHeading.append( mRobotContainer.mIMU.getAngle() );
-        imuTemp.append( mRobotContainer.mIMU.getTemp() );
-    }
+    public void robotPeriodic() {}
 
     @Override
     public void autonomousInit() {}
@@ -70,7 +67,21 @@ public class Robot extends TimedRobot {
     public void disabledInit() {}
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        // For competition code, the IMU calibration routine should be continuously called here to use the "latest and
+        // greatest" data from the IMU's CBE. For debug and understanding, here we use a timer to simulate the amount
+        // of time spent disabled before moving to the autoInit state without actually having to enable
+        // autonomous/teleop from the DS.
+        if ( timer.hasElapsed( 120 ) ) {
+            mRobotContainer.mIMU.calibrate();
+            mRobotContainer.mIMU.reset();
+            DriverStation.reportWarning( "ADIS16470 IMU recalibrated!", false );
+            timer.stop();
+            timer.reset();
+        }
+        imuHeading.append( mRobotContainer.mIMU.getAngle() );
+        imuTemp.append( mRobotContainer.mIMU.getTemp() );
+    }
 
     @Override
     public void testInit() {}

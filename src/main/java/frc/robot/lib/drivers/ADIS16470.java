@@ -255,7 +255,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
   }
 
   public ADIS16470() {
-    this(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._4s);
+    this(IMUAxis.kZ, SPI.Port.kOnboardCS0);
   }
 
   /**
@@ -263,9 +263,9 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
    * @param port The SPI Port the gyro is plugged into
    * @param cal_time Calibration time
    */
-  public ADIS16470(IMUAxis yaw_axis, SPI.Port port, CalibrationTime cal_time) {
+  public ADIS16470(IMUAxis yaw_axis, SPI.Port port) {
     m_yaw_axis = yaw_axis;
-    m_calibration_time = cal_time.value;
+    m_calibration_time = CalibrationTime._32s.value;
     m_spi_port = port;
 
     m_acquire_task = new Thread(new AcquireTask(this));
@@ -331,7 +331,6 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
       DriverStation.reportError( "ADIS16470 DEC_RATE register: " + readRegister(DEC_RATE), false);
       DriverStation.reportError( "ADIS16470 FILT_CTRL register: " + readRegister(FILT_CTRL), false);
 
-
       // Run selftest and report results (DIAG_STAT bit 5)
       writeRegister(GLOB_CMD, 0x0004);
       try {Thread.sleep(1000);} catch (InterruptedException e) {}
@@ -340,8 +339,7 @@ public class ADIS16470 implements AutoCloseable, NTSendable {
       // Notify DS that IMU calibration delay is active
       DriverStation.reportWarning("ADIS16470 starting initial calibration delay.", false);
 
-      // Wait for samples to accumulate internal to the IMU (110% of user-defined time)
-      //try {Thread.sleep((long) (Math.pow(2.0, m_calibration_time) / 2000 * 64 * 1.1 * 1000));} catch (InterruptedException e) {}
+      // Wait for samples to accumulate internal to the IMU
       try {Thread.sleep(30000);} catch (InterruptedException e) {}
 
       // Write offset calibration command to IMU

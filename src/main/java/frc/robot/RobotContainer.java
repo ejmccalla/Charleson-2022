@@ -2,7 +2,6 @@ package frc.robot;
 
 import frc.robot.Constants.HARDWARE;
 import edu.wpi.first.wpilibj.PowerDistribution;
-// import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.lib.drivers.ADIS16470;
 
 
@@ -10,7 +9,6 @@ public class RobotContainer {
 
     // Hardware
     public final PowerDistribution mPDP;
-    // public final ADIS16470_IMU mIMU;
     public final ADIS16470 mIMU;
     
     // Subsystems
@@ -36,8 +34,7 @@ public class RobotContainer {
 
     public RobotContainer () {
         mPDP = new PowerDistribution( HARDWARE.PDP_ID, PowerDistribution.ModuleType.kCTRE );
-        // mIMU = new ADIS16470_IMU(); 
-        mIMU = new ADIS16470(); 
+        mIMU = new ADIS16470(); // This will take ~35 seconds to initialize AND THE ROBOT CANNOT BE MOVED
 
     }
 
