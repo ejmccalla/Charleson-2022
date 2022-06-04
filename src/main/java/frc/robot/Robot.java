@@ -5,12 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation;
+//import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 
 /**
@@ -21,37 +17,15 @@ import edu.wpi.first.wpilibj.DriverStation;
  */
 public class Robot extends TimedRobot {
 
-    private static final RobotContainer mRobotContainer = new RobotContainer();
-    private static Timer timer = new Timer();
-    DoubleLogEntry imuHeading;
-    DoubleLogEntry imuTemp;
-
-    public Robot() {
-        super(0.005); 
-    }
 
     @Override
     public void robotInit() {
-        LiveWindow.disableAllTelemetry();
-        DataLogManager.start();
-        DataLogManager.logNetworkTables( false );
-        DataLog log = DataLogManager.getLog();
-        imuHeading = new DoubleLogEntry(log, "/sensors/heading");
-        imuTemp = new DoubleLogEntry(log, "/sensors/temp");
-        timer.start();
+        //LiveWindow.disableAllTelemetry();
     }
 
     @Override
     public void robotPeriodic() {
-        if ( timer.hasElapsed( 120 ) ) {
-            mRobotContainer.mIMU.calibrate();
-            mRobotContainer.mIMU.reset();
-            DriverStation.reportWarning( "ADIS16470 IMU recalibrated!", false );
-            timer.stop();
-            timer.reset();
-        }
-        imuHeading.append( mRobotContainer.mIMU.getAngle() );
-        imuTemp.append( mRobotContainer.mIMU.getTemp() );
+        CommandScheduler.getInstance().run();
     }
 
     @Override
