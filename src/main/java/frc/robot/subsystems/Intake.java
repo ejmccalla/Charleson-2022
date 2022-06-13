@@ -1,25 +1,23 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.REVLibError;
 import frc.robot.Constants.INTAKE;
 
-
 /**
-* The Drivetrain class is designed to use the command-based programming model and extends the SubsystemBase class.
-* @see {@link edu.wpi.first.wpilibj2.command.SubsystemBase}
-*/
-public class Intake extends SubsystemBase implements NTSendable {
+ * The Intake class is designed to use the command-based programming model and extends the SubsystemBase class.
+ * 
+ * @see {@link edu.wpi.first.wpilibj2.command.SubsystemBase}
+ */
+public class Intake extends SubsystemBase {
 
     // Hardware
     private final CANSparkMax mNeo550;
-
-    private double mMotorDutyCycle;
-
+    private RelativeEncoder mEncoder;
 
     //-----------------------------------------------------------------------------------------------------------------
     /*                                                PUBLIC METHODS                                                 */
@@ -27,17 +25,12 @@ public class Intake extends SubsystemBase implements NTSendable {
 
 
     /**
+     * This method will set the motor controller output using the given duty cycle.
      * 
+     * @param dutyCycle double Motor duty cycle
      */
-    public void EnableIntake () {
-        mNeo550.set( mMotorDutyCycle );
-    }
-
-    /**
-     * 
-     */
-    public void DisableIntake () {
-        mNeo550.set( 0.0 );
+    public void SetIntakeMotorOutput ( double dutyCycle ) {
+        mNeo550.set( dutyCycle );
     }
 
 
@@ -47,27 +40,8 @@ public class Intake extends SubsystemBase implements NTSendable {
 
 
     /**
-    * This method will set the motor duty cycle and is used by the live window sendable.
-    *
-    * @param dc double Motor duty cycle
-    */
-    private void SetMotorDutyCycle ( double dc ) {
-        mMotorDutyCycle = dc;
-    }
-
-    /**
-    * This method will get the motor duty cycle and is used by the live window sendable.
-    * 
-    * @return double The value of the motor duty cycle
-    */
-    private double GetMotorDutyCycle () {
-        return mMotorDutyCycle;
-    }
-
-       
-    /**
-    * This method will intialize the motor controller.
-    */ 
+     * This method will intialize the motor controller.
+     */ 
     private void ResetMotorController () {
         REVLibError error;
         short faults;
@@ -99,35 +73,43 @@ public class Intake extends SubsystemBase implements NTSendable {
         }        
 
         // Set 10A stall and free speed current limit
-        error = mNeo550.setSmartCurrentLimit( 10, 10 );
+        error = mNeo550.setSmartCurrentLimit( 20, 20 );
 
+    }
+
+    /**
+     * Get the linear velocity of the intake
+     */
+    private double GetIntakeLinearVelocity () {
+        return mEncoder.getVelocity();
     }
 
 
     //-----------------------------------------------------------------------------------------------------------------
     /*                                        CLASS CONSTRUCTOR AND OVERRIDES                                        */
     //-----------------------------------------------------------------------------------------------------------------
+    
+    
     /**
-    * The constructor for the Intake class.
-    */ 
+     * The constructor for the Intake class.
+     */ 
     public Intake () {
         mNeo550 = new CANSparkMax( INTAKE.CAN_ID, MotorType.kBrushless );
         ResetMotorController();
+        SetIntakeMotorOutput( 0.0 );
+        mEncoder = mNeo550.getEncoder();
+        mEncoder.setVelocityConversionFactor( Math.PI * INTAKE.DIAMETER_FT / 60.0 / INTAKE.GEARING_REDUCTION ); // Rev per Minute to Feet per Second
     }
-
 
     /**
-    * We are overriding the initSendable and using it to send information back-and-forth between the robot program and
-    * the user PC for live PID tuning purposes.
-    * 
-    * @param builder NTSendableBuilder This is inherited from SubsystemBase
-    */
+    * The subsystem periodic method gets called by the CommandScheduler at the very beginning of each robot loop.  All
+    * sensor readings should be updated in this method.
+    * @see {@link edu.wpi.first.wpilibj2.command.CommandScheduler#run}
+    */ 
     @Override
-    public void initSendable ( NTSendableBuilder builder ) {
-        builder.setSmartDashboardType( "Intake Tuning" );
-        builder.setActuator( true );
-        builder.setSafeState( this::DisableIntake );
-        builder.addDoubleProperty( "Duty Cycle", this::GetMotorDutyCycle, this::SetMotorDutyCycle );
+    public void periodic () {
+        SmartDashboard.putNumber("Intake Velocity (FPS)", GetIntakeLinearVelocity() );
     }
+
 
 }

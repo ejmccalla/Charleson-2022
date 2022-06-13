@@ -28,6 +28,8 @@ public final class Constants {
     */      
     public static final class INTAKE {
         public static final int CAN_ID = 12;                                    // Motor controller CAN ID AND PDP Port number
+        public static final double DIAMETER_FT = 0.088;                         // Diameter of the intake roller in feet
+        public static final double GEARING_REDUCTION = 5.0;                     // Gearing reduction
     }
 
 

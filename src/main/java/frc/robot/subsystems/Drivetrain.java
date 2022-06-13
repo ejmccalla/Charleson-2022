@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Constants.DRIVETRAIN;
 import frc.robot.lib.drivers.TalonSRX;
 import frc.robot.lib.drivers.VictorSPX;
-import frc.robot.lib.drivers.ADIS16470;
+//import frc.robot.lib.drivers.ADIS16470;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
@@ -27,7 +27,7 @@ public class Drivetrain extends SubsystemBase {
     private final WPI_VictorSPX mRightFollower_1;
     private final WPI_VictorSPX mRightFollower_2;
     public final DoubleSolenoid mShifter;
-    private final ADIS16470 mIMU;
+    //private final ADIS16470 mIMU;
 
     // Drive conrol (both open and closed loop)
     public DifferentialDrive mDifferentialDrive;
@@ -176,12 +176,16 @@ public class Drivetrain extends SubsystemBase {
         // mLeftMaster.configSelectedFeedbackCoefficient(coefficient)
         VictorSPX.ConfigureVictorSPX( mLeftFollower_1 );
         VictorSPX.ConfigureVictorSPX( mLeftFollower_2 );
+        
         TalonSRX.ConfigureTalonSRX( mRightMaster );
         TalonSRX.CTREMagEncoderConfig( mRightMaster );
+        mRightMaster.setInverted( true );
         // mRightMaster.setSensorPhase();
         // mRightMaster.configSelectedFeedbackCoefficient(coefficient)
         VictorSPX.ConfigureVictorSPX( mRightFollower_1 );
+        mRightFollower_1.setInverted( true );
         VictorSPX.ConfigureVictorSPX( mRightFollower_2 );
+        mRightFollower_2.setInverted( true );
     }
 
     /**
@@ -223,7 +227,7 @@ public class Drivetrain extends SubsystemBase {
         mRightFollower_2 = new WPI_VictorSPX( DRIVETRAIN.RIGHT_FOLLOWER_2_ID );
         mShifter = new DoubleSolenoid( PneumaticsModuleType.CTREPCM, DRIVETRAIN.HIGH_GEAR_SOLENOID_ID, 
                                                      DRIVETRAIN.LOW_GEAR_SOLENOID_ID );
-        mIMU = new ADIS16470(); 
+        //mIMU = new ADIS16470(); 
 
 
         mLeftMotorControllerGroup = new MotorControllerGroup( mLeftMaster, mLeftFollower_1, mLeftFollower_2 );
@@ -232,15 +236,5 @@ public class Drivetrain extends SubsystemBase {
         Initialize();
     }
 
-
-    /**
-    * The subsystem periodic method gets called by the CommandScheduler at the very beginning of each robot loop. All
-    * sensor readings should be updated in this method.
-    * @see {@link edu.wpi.first.wpilibj2.command.CommandScheduler#run}
-    */ 
-    @Override
-    public void periodic () {
-    
-    }
 
 }

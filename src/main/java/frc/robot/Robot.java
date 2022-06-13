@@ -5,8 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-//import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.TeleopDrive;
 
 
 /**
@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+
+    private static final RobotContainer mRobotContainer = new RobotContainer();
 
 
     @Override
@@ -47,7 +49,10 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {}
 
     @Override
-    public void testInit() {}
+    public void testInit() {
+        // The command scheduler needs to be re-enabled to run process user imput and run the default subsytem commands.
+        CommandScheduler.getInstance().enable();
+    }
 
     @Override
     public void testPeriodic() {}

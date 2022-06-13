@@ -17,9 +17,9 @@ public class TeleopDrive extends CommandBase {
     @Override
     public void execute() {
         if ( mDriverThrottle.getX() < DRIVER.QUICKTURN_THRESHOLD ) {
-            mDrivetrain.SetOpenLoopOutput( mDriverThrottle.getX(), mDriverTurn.getY(), true );            
+            mDrivetrain.SetOpenLoopOutput( mDriverThrottle.getY(), mDriverTurn.getX(), true );            
         } else {
-            mDrivetrain.SetOpenLoopOutput( mDriverThrottle.getX(), mDriverTurn.getY(), false );
+            mDrivetrain.SetOpenLoopOutput( mDriverThrottle.getY(), mDriverTurn.getX(), false );
         }
     }
 
@@ -31,11 +31,16 @@ public class TeleopDrive extends CommandBase {
       return false;
     }
 
+    @Override
+    public boolean runsWhenDisabled() {
+        return false;
+    }    
+
     public TeleopDrive ( Drivetrain drivetrain, Joystick driverThrottle, Joystick driverTurn ) {
         mDrivetrain = drivetrain;
         mDriverThrottle = driverThrottle;
         mDriverTurn = driverTurn;
-        addRequirements(mDrivetrain);
+        addRequirements( mDrivetrain );
     }
 
 }
